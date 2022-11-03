@@ -98,7 +98,7 @@ class SingleAssetOrderExecutionSimple(Simulator[Order, SAOEState, float]):
         self.cur_time = self.ticks_for_order[0]
         # NOTE: astype(float) is necessary in some systems.
         # this will align the precision with `.to_numpy()` in `_split_exec_vol`
-        self.twap_price = float(self.backtest_data.get_deal_price().loc[self.ticks_for_order].astype(float).mean())
+        self.twap_price = float(self.backtest_data.deal_price.loc[self.ticks_for_order].astype(float).mean())
 
         self.position = order.amount
 
@@ -238,8 +238,8 @@ class SingleAssetOrderExecutionSimple(Simulator[Order, SAOEState, float]):
         next_time = self._next_time()
 
         # get the backtest data for next interval
-        self.market_vol = self.backtest_data.get_volume().loc[self.cur_time : next_time - EPS_T].to_numpy()
-        self.market_price = self.backtest_data.get_deal_price().loc[self.cur_time : next_time - EPS_T].to_numpy()
+        self.market_vol = self.backtest_data.volume.loc[self.cur_time : next_time - EPS_T].to_numpy()
+        self.market_price = self.backtest_data.deal_price.loc[self.cur_time : next_time - EPS_T].to_numpy()
 
         assert self.market_vol is not None and self.market_price is not None
 

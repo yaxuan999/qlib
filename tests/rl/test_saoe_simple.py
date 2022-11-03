@@ -93,8 +93,8 @@ def test_simulator_stop_twap():
     assert state.history_steps["position"].iloc[0] == 12 and state.history_steps["position"].iloc[-1] == 0
 
     assert (state.metrics["ffr"] - 1) < 1e-3
-    assert abs(state.metrics["market_price"] - state.backtest_data.get_deal_price().mean()) < 1e-4
-    assert np.isclose(state.metrics["market_volume"], state.backtest_data.get_volume().sum())
+    assert abs(state.metrics["market_price"] - state.backtest_data.deal_price.mean()) < 1e-4
+    assert np.isclose(state.metrics["market_volume"], state.backtest_data.volume.sum())
     assert state.position == 0.0
     assert abs(state.metrics["trade_price"] - state.metrics["market_price"]) < 1e-4
     assert abs(state.metrics["pa"]) < 1e-2

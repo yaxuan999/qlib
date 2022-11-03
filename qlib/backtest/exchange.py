@@ -175,7 +175,7 @@ class Exchange:
         # 　get volume limit from kwargs
         self.buy_vol_limit, self.sell_vol_limit, vol_lt_fields = self._get_vol_limit(volume_threshold)
 
-        necessary_fields = {self.buy_price, self.sell_price, "$close", "$change", "$factor", "$volume"}
+        necessary_fields = {self.buy_price, self.sell_price, "$close", "$change", "$factor", "$volume", "$vwap"}
         if self.limit_type == self.LT_TP_EXP:
             assert isinstance(limit_threshold, tuple)
             for exp in limit_threshold:
@@ -489,6 +489,15 @@ class Exchange:
     ) -> Union[None, int, float, bool, IndexData]:
         """get the total deal volume of stock with `stock_id` between the time interval [start_time, end_time)"""
         return self.quote.get_data(stock_id, start_time, end_time, field="$volume", method=method)
+
+    def get_vwap(
+        self,
+        stock_id: str,
+        start_time: pd.Timestamp,
+        end_time: pd.Timestamp,
+        method: Optional[str] = "sum",
+    ) -> Union[None, int, float, bool, IndexData]:
+        return self.quote.get_data(stock_id, start_time, end_time, field="$vwap", method=method)
 
     def get_deal_price(
         self,

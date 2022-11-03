@@ -97,3 +97,6 @@ class SAOEState(NamedTuple):
     """Trading ticks in all day, NOT sliced by order (defined in data). e.g., [9:30, 9:31, ..., 14:59]."""
     ticks_for_order: pd.DatetimeIndex
     """Trading ticks sliced by order, e.g., [9:45, 9:46, ..., 14:44]."""
+
+    tt_ratio: Optional[float]
+    """TODO: add doc string"""

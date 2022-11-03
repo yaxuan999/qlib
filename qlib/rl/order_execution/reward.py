@@ -7,6 +7,7 @@ from typing import cast
 
 import numpy as np
 
+from qlib.backtest.decision import OrderDir
 from qlib.rl.order_execution.state import SAOEMetrics, SAOEState
 from qlib.rl.reward import Reward
 
@@ -44,3 +45,20 @@ class PAPenaltyReward(Reward[SAOEState]):
         self.log("reward/pa", pa)
         self.log("reward/penalty", penalty)
         return reward
+
+
+class PPOReward(Reward[SAOEState]):
+    """The reward function defined in IJCAI 2020.
+    """
+
+    def reward(self, simulator_state: SAOEState) -> float:
+        tt_ratio = simulator_state.tt_ratio
+        if simulator_state.order.direction == OrderDir.Buy:
+            tt_ratio = 1.0 / tt_ratio
+
+        if tt_ratio < 1.0:
+            return -1.0
+        elif tt_ratio < 1.1:
+            return 0.0
+        else:
+            return 1.0

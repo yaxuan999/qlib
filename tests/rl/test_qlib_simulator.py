@@ -169,8 +169,8 @@ def test_simulator_stop_twap() -> None:
     assert is_close(state.position, 0.0)
     assert is_close(state.metrics["ffr"], 1.0)
 
-    assert is_close(state.metrics["market_price"], state.backtest_data.get_deal_price().mean())
-    assert is_close(state.metrics["market_volume"], state.backtest_data.get_volume().sum())
+    assert is_close(state.metrics["market_price"], state.backtest_data.deal_price.mean())
+    assert is_close(state.metrics["market_volume"], state.backtest_data.volume.sum())
     assert is_close(state.metrics["trade_price"], state.metrics["market_price"])
     assert is_close(state.metrics["pa"], 0.0)
 

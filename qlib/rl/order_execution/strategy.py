@@ -78,6 +78,11 @@ def fill_missing_data(
     return np.array([tmp.get(t, fill_val) for t in total_time_list])
 
 
+def weighted_mean(vals: np.array, weights: np.array) -> float:
+    """Calculate average value of `vals` with weights."""
+    return (vals * weights).sum() / weights.sum()
+
+
 class SAOEStateAdapter:
     """
     Maintain states of the environment. SAOEStateAdapter accepts execution results and update its internal state
@@ -106,7 +111,9 @@ class SAOEStateAdapter:
         self.exchange = exchange
         self.backtest_data = backtest_data
 
-        self.twap_price = self.backtest_data.get_deal_price().mean()
+        self.twap_price = self.backtest_data.deal_price.mean()
+        self.acc_cash = 0.0  # TODO: add description
+        self.tt_ratio: Optional[float] = None  # TODO: add description
 
         metric_keys = list(SAOEMetrics.__annotations__.keys())  # pylint: disable=no-member
         self.history_exec = pd.DataFrame(columns=metric_keys).set_index("datetime")
@@ -115,6 +122,14 @@ class SAOEStateAdapter:
 
         self.cur_time = max(backtest_data.ticks_for_order[0], order.start_time)
         self.ticks_per_step = ticks_per_step
+
+        self.vwap_intraday = np.array(backtest_data.vwap_intraday)
+        self.vwap_intraday = np.nan_to_num(self.vwap_intraday, nan=np.nanmedian(self.vwap_intraday))
+        self.vwap_intraday_mean = self.vwap_intraday.mean()
+        volume_intraday = np.array(backtest_data.volume_intraday)
+        volume_intraday = np.nan_to_num(volume_intraday, nan=np.nanmedian(volume_intraday))
+
+        self.day_vwap = weighted_mean(vals=self.vwap_intraday, weights=volume_intraday)
 
     def _next_time(self) -> pd.Timestamp:
         current_loc = self.backtest_data.ticks_index.get_loc(self.cur_time)
@@ -201,6 +216,10 @@ class SAOEStateAdapter:
             ],
         )
 
+        cur_vwap = self.vwap_intraday[last_step_range[0]:last_step_range[1] + 1]
+        assert cur_vwap.shape == exec_vol.shape
+        self.acc_cash += (cur_vwap * exec_vol).sum()
+
         # Do this at the end
         self.position -= exec_vol.sum()
 
@@ -217,6 +236,12 @@ class SAOEStateAdapter:
             self.history_steps["amount"].sum(),
             self.history_exec["deal_amount"],
         )
+
+    def update_state_after_done(self) -> None:
+        """Update state once the upper level execution is done"""
+        traded = self.order.amount - self.position
+        this_vwap = (self.this_cash / traded) if traded > 1e-7 else self.day_vwap
+        self.tt_ratio = this_vwap / self.vwap_intraday_mean
 
     def _collect_multi_order_metric(
         self,
@@ -294,6 +319,7 @@ class SAOEStateAdapter:
             ticks_per_step=self.ticks_per_step,
             ticks_index=self.backtest_data.ticks_index,
             ticks_for_order=self.backtest_data.ticks_for_order,
+            tt_ratio=self.tt_ratio,
         )
 
 
@@ -351,6 +377,7 @@ class SAOEStrategy(RLStrategy):
     def post_upper_level_exe_step(self) -> None:
         for adapter in self.adapter_dict.values():
             adapter.generate_metrics_after_done()
+            adapter.update_state_after_done()
 
     def post_exe_step(self, execute_result: Optional[list]) -> None:
         last_step_length = self._last_step_range[1] - self._last_step_range[0]

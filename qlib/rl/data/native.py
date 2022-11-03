@@ -33,7 +33,8 @@ class IntradayBacktestData(BaseIntradayBacktestData):
         self.ticks_index = ticks_index
         self.ticks_for_order = ticks_for_order
 
-        self._deal_price = cast(
+        # Data within `ticks_for_order`
+        self.deal_price = cast(
             pd.Series,
             self._exchange.get_deal_price(
                 self._order.stock_id,
@@ -43,12 +44,32 @@ class IntradayBacktestData(BaseIntradayBacktestData):
                 method=None,
             ),
         )
-        self._volume = cast(
+        self.volume = cast(
             pd.Series,
             self._exchange.get_volume(
                 self._order.stock_id,
                 self._start_time,
                 self._end_time,
+                method=None,
+            ),
+        )
+
+        # Data within `ticks_index`, i.e., the entire day.
+        self.volume_intraday = cast(
+            pd.Series,
+            self._exchange.get_volume(
+                self._order.stock_id,
+                self.ticks_index[0],
+                self.ticks_index[-1],
+                method=None,
+            ),
+        )
+        self.vwap_intraday = cast(
+            pd.Series,
+            self._exchange.get_vwap(
+                self._order.stock_id,
+                self.ticks_index[0],
+                self.ticks_index[-1],
                 method=None,
             ),
         )
@@ -60,13 +81,7 @@ class IntradayBacktestData(BaseIntradayBacktestData):
         )
 
     def __len__(self) -> int:
-        return len(self._deal_price)
-
-    def get_deal_price(self) -> pd.Series:
-        return self._deal_price
-
-    def get_volume(self) -> pd.Series:
-        return self._volume
+        return len(self.deal_price)
 
     def get_time_index(self) -> pd.DatetimeIndex:
         return pd.DatetimeIndex([e[1] for e in list(self._exchange.quote_df.index)])
