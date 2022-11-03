@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 import argparse
 import os
+import sys
 import random
 from pathlib import Path
 from typing import cast, List, Optional
@@ -164,6 +165,13 @@ def train_and_test(
 def main(config: dict) -> None:
     if "seed" in config["runtime"]:
         seed_everything(config["runtime"]["seed"])
+
+    if "extra_module_paths" in config["env"]:
+        extra_module_paths = config["env"].pop("extra_module_paths")
+        if isinstance(extra_module_paths, list):
+            sys.path += extra_module_paths
+        else:
+            sys.path.append(extra_module_paths)
 
     state_config = config["state_interpreter"]
     state_interpreter: StateInterpreter = init_instance_by_config(state_config)
