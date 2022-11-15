@@ -7,7 +7,7 @@ state_interpreter:  # TODO
   class: FullHistoryStateInterpreter
   kwargs:
     data_dim: 6  # 240 * 6 * 2 = 2880
-    data_ticks: 237  # TODO: check if this is okay
+    data_ticks: 240
     max_step: 8
     processed_data_provider:
       class: PickleProcessedDataProvider
@@ -33,7 +33,7 @@ runtime:
   use_cuda: False  # TODO: change to true
 trainer:
   checkpoint_path: './outputs/PPO/'
-  checkpoint_every_n_iters: 1,
+  checkpoint_every_n_iters: 1
   batch_size: 1024
   max_epoch: 30  # 30 * 20?
   episode_per_collect: 10000
@@ -42,10 +42,10 @@ trainer:
 policy:
   class: PPO
   kwargs:
-    lr: 1e-4
+    lr: 0.0001
     discount_factor: 1.0
     max_grad_norm: 100.0
-    reward_normalization: False
+    reward_normalization: True  # TODO: value clip is available only when `reward_normalization` is True
     eps_clip: 0.3
     value_clip: True
     vf_coef: 1.0
@@ -59,3 +59,6 @@ network:  # TODO
 simulator:
   time_per_step: 30
   vol_limit: 10
+env:
+  concurrency: 1
+  parallel_mode: dummy

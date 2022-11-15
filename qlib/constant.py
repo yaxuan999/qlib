@@ -12,7 +12,7 @@ REG_US = "us"
 REG_TW = "tw"
 
 # Epsilon for avoiding division by zero.
-EPS = 1e-12
+EPS = 1e-6
 
 # Infinity in integer
 INF = int(1e18)

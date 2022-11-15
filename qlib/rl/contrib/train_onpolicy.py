@@ -56,6 +56,7 @@ class LazyLoadDataset(Dataset):
 
         self._order_file_path = order_file_path
         self._order_df = _read_orders(order_file_path).reset_index()
+        self._order_df = self._order_df[self._order_df["amount"] > 0.0]
 
         self._data_dir = data_dir
         self._ticks_index: Optional[pd.DatetimeIndex] = None
