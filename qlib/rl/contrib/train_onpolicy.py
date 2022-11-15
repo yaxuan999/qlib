@@ -128,7 +128,7 @@ def train_and_test(
         callbacks.append(
             Checkpoint(
                 dirpath=Path(trainer_config["checkpoint_path"]),
-                every_n_iters=trainer_config["checkpoint_every_n_iters"],
+                every_n_iters=trainer_config.get("checkpoint_every_n_iters", 1),
                 save_latest="copy",
             ),
         )
