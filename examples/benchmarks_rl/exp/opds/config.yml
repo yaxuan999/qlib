@@ -3,8 +3,8 @@ action_interpreter:
   kwargs:
     values: 4
   module_path: qlib.rl.order_execution.interpreter
-state_interpreter:  # TODO
-  class: FullHistoryStateInterpreter
+state_interpreter:
+  class: WholeDayStateInterpreter
   kwargs:
     data_dim: 6  # 240 * 6 * 2 = 2880
     data_ticks: 240
@@ -14,7 +14,7 @@ state_interpreter:  # TODO
       module_path: qlib.rl.data.pickle_styled
       kwargs:
         data_dir: /home/huoran/trade_data/normed_feature/
-  module_path: qlib.rl.order_execution.interpreter
+  module_path: interpreter
 reward:
   class: PAPenaltyReward
   kwargs:
@@ -35,10 +35,14 @@ trainer:
   checkpoint_path: './outputs/PPO/'
   checkpoint_every_n_iters: 1
   batch_size: 1024
-  max_epoch: 30  # 30 * 20?
-  episode_per_collect: 10000
-  repeat_per_collect: 5
-  earlystop_patience: 5
+  max_epoch: 1
+  episode_per_collect: 1
+  repeat_per_collect: 1
+  earlystop_patience: 1
+  # max_epoch: 30  # 30 * 20?
+  # episode_per_collect: 10000
+  # repeat_per_collect: 5
+  # earlystop_patience: 5
 policy:
   class: PPO
   kwargs:
@@ -53,9 +57,13 @@ policy:
     # vf_clip_para: 0.3
     weight_decay: 0.0
   module_path: qlib.rl.order_execution.policy
-network:  # TODO
-  class: Recurrent
-  module_path: qlib.rl.order_execution.network
+network:
+  class: PPONetwork
+  kwargs:
+    max_step: 237
+    hidden_dim: 64
+    cnn_shape: [30, 6]
+  module_path: network
 simulator:
   time_per_step: 30
   vol_limit: 10
