@@ -35,6 +35,7 @@ trainer:
   checkpoint_path: './outputs/PPO/'
   checkpoint_every_n_iters: 1
   batch_size: 1024
+  val_every_n_epoch: 1
   max_epoch: 1
   episode_per_collect: 1
   repeat_per_collect: 1

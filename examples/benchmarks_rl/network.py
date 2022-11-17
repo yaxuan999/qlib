@@ -37,8 +37,8 @@ class PPONetwork(nn.Module):
 
     def _get_private_state(self, obs: WholeDayObs) -> torch.Tensor:
         batch_size = obs["position_history"].shape[0]
-        return torch.cat([  # TODO: The order of columns should be Okay. Check with Yuge & Kan.
-            obs["position_history"] / obs["target"],
+        return torch.cat([  # TODO: The order of columns should be okay. Check with Yuge & Kan.
+            obs["position_history"] / obs["target"].unsqueeze(-1),
             obs["tick_history"] / self.max_step,
             torch.zeros((batch_size, 2), dtype=torch.float32),
         ], dim=-1)
