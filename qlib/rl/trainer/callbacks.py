@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+import pandas as pd
 import torch
 
 from qlib.log import get_module_logger
@@ -175,6 +176,20 @@ class EarlyStopping(Callback):
 
     def _is_improvement(self, monitor_value, reference_value):
         return self.monitor_op(monitor_value - self.min_delta, reference_value)
+
+
+class ValidationWriter(Callback):
+    """Dump validation results to file."""
+    def __init__(self, dirpath: Path) -> None:
+        self.dirpath = dirpath
+        self.dirpath.mkdir(exist_ok=True, parents=True)
+        self.all_records = []
+
+    def on_validate_end(self, trainer: Trainer, vessel: TrainingVesselBase) -> None:
+        self.all_records.append(trainer.metrics)
+
+    def on_fit_end(self, trainer: Trainer, vessel: TrainingVesselBase) -> None:
+        pd.DataFrame.from_records(self.all_records).to_csv(self.dirpath / "validation_result.csv", index=True)
 
 
 class Checkpoint(Callback):

@@ -18,6 +18,7 @@ from qlib.rl.interpreter import ActionInterpreter, StateInterpreter
 from qlib.rl.order_execution import SingleAssetOrderExecutionSimple
 from qlib.rl.reward import Reward
 from qlib.rl.trainer import Checkpoint, backtest, train
+from qlib.rl.trainer.callbacks import ValidationWriter
 from qlib.rl.utils.log import CsvWriter
 from qlib.utils import init_instance_by_config
 from tianshou.policy import BasePolicy
@@ -112,26 +113,17 @@ def train_and_test(
             vol_threshold=simulator_config["vol_limit"],
         )
 
-    train_dataset = LazyLoadDataset(
-        order_file_path=order_root_path / "train",
-        data_dir=Path(data_config["source"]["data_dir"]),
-        default_start_time_index=data_config["source"]["default_start_time"],
-        default_end_time_index=data_config["source"]["default_end_time"],
-    )
-    valid_dataset = LazyLoadDataset(
-        order_file_path=order_root_path / "valid",
-        data_dir=Path(data_config["source"]["data_dir"]),
-        default_start_time_index=data_config["source"]["default_start_time"],
-        default_end_time_index=data_config["source"]["default_end_time"],
-    )
-    test_dataset = LazyLoadDataset(
-        order_file_path=order_root_path / "test",
-        data_dir=Path(data_config["source"]["data_dir"]),
-        default_start_time_index=data_config["source"]["default_start_time"],
-        default_end_time_index=data_config["source"]["default_end_time"],
-    )
+    train_dataset, valid_dataset, test_dataset = [
+        LazyLoadDataset(
+            order_file_path=order_root_path / tag,
+            data_dir=Path(data_config["source"]["data_dir"]),
+            default_start_time_index=data_config["source"]["default_start_time"],
+            default_end_time_index=data_config["source"]["default_end_time"],
+        ) 
+        for tag in ("train", "valid", "test")
+    ]
 
-    callbacks = []
+    callbacks = [ValidationWriter(dirpath=Path(trainer_config["checkpoint_path"]))]
     if "checkpoint_path" in trainer_config:
         callbacks.append(
             Checkpoint(
