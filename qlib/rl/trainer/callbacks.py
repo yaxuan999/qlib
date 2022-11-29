@@ -156,6 +156,10 @@ class EarlyStopping(Callback):
             if self.baseline is None or self._is_improvement(current, self.baseline):
                 self.wait = 0
 
+        msg = f"#{trainer.current_iter} current reward: {current:.4f}, best reward: {self.best:.4f} in #{self.best_iter}"
+        print(msg)
+        _logger.info(msg)
+
         # Only check after the first epoch.
         if self.wait >= self.patience and trainer.current_iter > 0:
             trainer.should_stop = True

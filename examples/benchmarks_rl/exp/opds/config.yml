@@ -35,15 +35,11 @@ trainer:
   checkpoint_path: './outputs/PPO/'
   checkpoint_every_n_iters: 1
   batch_size: 1024
-  max_epoch: 5
+  max_epoch: 30
   val_every_n_epoch: 1
-  episode_per_collect: 1
-  repeat_per_collect: 1
-  earlystop_patience: 1
-  # max_epoch: 30  # 30 * 20?
-  # episode_per_collect: 10000
-  # repeat_per_collect: 5
-  # earlystop_patience: 5
+  episode_per_collect: 10000
+  repeat_per_collect: 5
+  earlystop_patience: 5
 policy:
   class: PPO
   kwargs:
@@ -69,5 +65,5 @@ simulator:
   time_per_step: 30
   vol_limit: 10
 env:
-  concurrency: 1
-  parallel_mode: dummy
+  concurrency: 32
+  parallel_mode: shmem
