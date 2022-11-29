@@ -27,6 +27,8 @@ examples/estimator/estimator_example/
 examples/rl/data/
 examples/rl/checkpoints/
 examples/rl/outputs/
+examples/benchmarks_rl/data/
+examples/benchmarks_rl/outputs/
 
 *.egg-info/
 

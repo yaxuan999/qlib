@@ -6,14 +6,14 @@ action_interpreter:
 state_interpreter:
   class: WholeDayStateInterpreter
   kwargs:
-    data_dim: 6  # 240 * 6 * 2 = 2880
+    data_dim: 6
     data_ticks: 240
     max_step: 8
     processed_data_provider:
       class: PickleProcessedDataProvider
       module_path: qlib.rl.data.pickle_styled
       kwargs:
-        data_dir: /home/huoran/trade_data/normed_feature/
+        data_dir: data/normed_feature/
   module_path: interpreter
 reward:
   class: PAPenaltyReward
@@ -22,17 +22,16 @@ reward:
   module_path: qlib.rl.order_execution.reward
 data:
   source:
-    order_dir: /home/huoran/trade_data/order/
-    data_dir: /home/huoran/trade_data/backtest/
+    order_dir: data/order/
+    data_dir: data/backtest/
     total_time: 237
     default_start_time: 0
     default_end_time: 237
-    # proc_data_dim: -1  # TODO
 runtime:
   seed: 42
-  use_cuda: False  # TODO: change to true
+  use_cuda: False
 trainer:
-  checkpoint_path: './outputs/PPO/'
+  checkpoint_path: './outputs/OPDS/'
   checkpoint_every_n_iters: 1
   batch_size: 1024
   max_epoch: 30
@@ -46,12 +45,11 @@ policy:
     lr: 0.0001
     discount_factor: 1.0
     max_grad_norm: 100.0
-    reward_normalization: True  # TODO: value clip is available only when `reward_normalization` is True
+    reward_normalization: True
     eps_clip: 0.3
     value_clip: True
     vf_coef: 1.0
     gae_lambda: 1.0
-    # vf_clip_para: 0.3
     weight_decay: 0.0
   module_path: qlib.rl.order_execution.policy
 network:
@@ -66,4 +64,4 @@ simulator:
   vol_limit: 10
 env:
   concurrency: 32
-  parallel_mode: shmem
+  parallel_mode: shmem  # shmem, dummy
