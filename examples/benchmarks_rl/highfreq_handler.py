@@ -1,6 +1,4 @@
 from qlib.data.dataset.handler import DataHandler, DataHandlerLP
-from qlib.contrib.data.handler import check_transform_proc
-
 
 class HighFreqHandler(DataHandlerLP):
     def __init__(
@@ -14,9 +12,20 @@ class HighFreqHandler(DataHandlerLP):
         fit_end_time=None,
         drop_raw=True,
     ):
+        def check_transform_proc(proc_l):
+            new_l = []
+            for p in proc_l:
+                p["kwargs"].update(
+                    {
+                        "fit_start_time": fit_start_time,
+                        "fit_end_time": fit_end_time,
+                    }
+                )
+                new_l.append(p)
+            return new_l
 
-        infer_processors = check_transform_proc(infer_processors, fit_start_time, fit_end_time)
-        learn_processors = check_transform_proc(learn_processors, fit_start_time, fit_end_time)
+        infer_processors = check_transform_proc(infer_processors)
+        learn_processors = check_transform_proc(learn_processors)
 
         data_loader = {
             "class": "QlibDataLoader",
@@ -99,6 +108,8 @@ class HighFreqHandler(DataHandlerLP):
         ]
         names += ["$volume_1"]
 
+        fields += ["Cut({0}, 240, None)".format(template_paused.format("Date($close)"))]
+        names += ["date"]
         return fields, names
 
 

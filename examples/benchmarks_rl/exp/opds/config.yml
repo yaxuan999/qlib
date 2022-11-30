@@ -13,7 +13,7 @@ state_interpreter:
       class: PickleProcessedDataProvider
       module_path: qlib.rl.data.pickle_styled
       kwargs:
-        data_dir: data/normed_feature/
+        data_dir: /home/huoran/trade_data/normed_feature/
   module_path: interpreter
 reward:
   class: PAPenaltyReward
@@ -22,8 +22,8 @@ reward:
   module_path: qlib.rl.order_execution.reward
 data:
   source:
-    order_dir: data/order/
-    data_dir: data/backtest/
+    order_dir: /home/huoran/trade_data/order/
+    data_dir: /home/huoran/trade_data/backtest/
     total_time: 237
     default_start_time: 0
     default_end_time: 237

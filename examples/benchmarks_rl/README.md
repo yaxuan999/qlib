@@ -22,4 +22,12 @@ The generated data will be stored in `data/`.
 
 ## Training and Backtest
 
+All information of a RL job is formulated in the config file. Currently, we provide `exp/opds/config.yml` as an example. To launch the RL job using this config file, run:
+
+``python -m qlib.rl.contrib.train_onpolicy --config_path exp/opds/config.yml``
+
+This RL job takes hours, depending on your computation power. If you have other customized config files, just simply change the config path to launch the job.
+
+## Benchmarks
+
 
