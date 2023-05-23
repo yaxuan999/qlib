@@ -105,8 +105,6 @@ class KRNNEncoderBase(nn.Module):
         ----------
         x : torch.Tensor
             Input data
-        n_id : torch.Tensor
-            Node indices
 
         Returns
         -------
@@ -165,8 +163,6 @@ class CNNKRNNEncoder(nn.Module):
         ----------
         x : torch.Tensor
             Input data
-        n_id : torch.Tensor
-            Node indices
 
         Returns
         -------
@@ -430,15 +426,10 @@ class KRNN(Model):
         return np.mean(losses), np.mean(scores)
 
     def fit(
-        self,
-        dataset: DatasetH,
-        evals_result=dict(),
-        save_path=None,
+        self, dataset: DatasetH, evals_result=dict(), save_path=None,
     ):
         df_train, df_valid, df_test = dataset.prepare(
-            ["train", "valid", "test"],
-            col_set=["feature", "label"],
-            data_key=DataHandlerLP.DK_L,
+            ["train", "valid", "test"], col_set=["feature", "label"], data_key=DataHandlerLP.DK_L,
         )
         if df_train.empty or df_valid.empty:
             raise ValueError("Empty data from dataset, please check your dataset config.")
